@@ -57,12 +57,18 @@ func (dc *DefaultComponent) SetChild(key string, child Component) {
 
 type HelloComponent struct {
 	DefaultComponent
+	Name string
 }
 
 func NewHelloComponent() Component {
-	return &HelloComponent{}
+	return &HelloComponent{
+		Name: "Hello",
+	}
 }
 
 func (hc *HelloComponent) Render() string {
-	return "<div><p>Hello</p><div>"
+	return `<div>
+    <p>{{.Name}}</p>
+    <input value="{{.Name}}" placeholder="Name input" onchange="Name" autofocus>
+  <div>`
 }
