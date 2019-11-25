@@ -10,6 +10,11 @@ import (
 type Component interface {
 	GetId() string
 	SetId(string)
+	SetParent(c Component)
+	GetParent() Component
+	SetHeader(key, value string)
+	GetHeader(key string) string
+	GetHeaders() map[string]string
 	GetChildren() map[string]Component
 	SetChild(key string, child Component)
 	Render() string
@@ -20,6 +25,8 @@ type Component interface {
 
 type BaseComponent struct {
 	Id       string
+	Parent   Component
+	Headers  map[string]string
 	Children map[string]Component
 }
 
@@ -62,23 +69,59 @@ func Generate(c Component) string {
 	return buf.String()
 }
 
-func (dc *BaseComponent) GetChildren() map[string]Component {
-	return dc.Children
+func (bc *BaseComponent) GetChildren() map[string]Component {
+	return bc.Children
 }
 
-func (dc *BaseComponent) SetChild(key string, child Component) {
-	if dc.Children == nil {
-		dc.Children = make(map[string]Component)
+func (bc *BaseComponent) SetChild(key string, child Component) {
+	if bc.Children == nil {
+		bc.Children = make(map[string]Component)
 	}
-	dc.Children[key] = child
+	child.SetParent(bc)
+	bc.Children[key] = child
 }
 
-func (dc *BaseComponent) GetId() string {
-	return dc.Id
+func (bc *BaseComponent) GetId() string {
+	return bc.Id
 }
 
-func (dc *BaseComponent) SetId(string id) {
-	dc.Id = id
+func (bc *BaseComponent) SetId(id string) {
+	bc.Id = id
+}
+
+func (bc *BaseComponent) GetParent() Component {
+	return bc.Parent
+}
+
+func (bc *BaseComponent) SetParent(c Component) {
+	bc.Parent = c
+}
+
+func (bc *BaseComponent) SetHeader(key, value string) {
+	if bc.Headers == nil {
+		bc.Headers = make(map[string]string)
+	}
+	bc.Headers[key] = value
+}
+
+func (bc *BaseComponent) GetHeader(key string) string {
+	if bc.Headers == nil {
+		return ""
+	}
+	return bc.Headers[key]
+}
+
+func (bc *BaseComponent) GetHeaders() map[string]string {
+	headers := make(map[string]string)
+	for _, child := range bc.GetChildren() {
+		for key, value := range child.GetHeaders() {
+			headers[key] = value
+		}
+	}
+	for key, value := range bc.Headers {
+		headers[key] = value
+	}
+	return headers
 }
 
 func (dc *BaseComponent) OnChange(e js.Value) {

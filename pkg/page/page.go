@@ -10,14 +10,10 @@ type Page interface {
 	component.Component
 	SetTitle(title string)
 	GetTitle() string
-	SetHeader(key, value string)
-	GetHeader(key string) string
-	GetHeaders() map[string]string
 }
 
 type BasePage struct {
 	component.BaseComponent
-	Headers map[string]string
 }
 
 func (dp *BasePage) SetTitle(title string) {
@@ -28,22 +24,8 @@ func (dp *BasePage) GetTitle() string {
 	return dp.Headers["title"]
 }
 
-func (dp *BasePage) SetHeader(key, value string) {
-	dp.Headers[key] = value
-}
-
-func (dp *BasePage) GetHeader(key string) string {
-	return dp.Headers[key]
-}
-
-func (dp *BasePage) GetHeaders() map[string]string {
-	return dp.Headers
-}
-
 func NewBasePage() Page {
-	dp := &BasePage{
-		Headers: make(map[string]string),
-	}
+	dp := &BasePage{}
 	dp.SetTitle("Default")
 	dp.SetHeader("charset", `<meta charset="utf-8">`)
 	dp.SetHeader("viewport", `<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">`)
@@ -79,20 +61,3 @@ func (dp *BasePage) Render() string {
   </html>
   `
 }
-
-/*
-func (dp *BasePage) String() string {
-	templateText := dp.Render()
-	tmpl, err := template.New("Render").Parse(templateText)
-	if err != nil {
-		return err.Error()
-	}
-
-	buf := new(bytes.Buffer)
-	err = tmpl.Execute(buf, dp)
-	if err != nil {
-		return err.Error()
-	}
-	return buf.String()
-}
-*/
