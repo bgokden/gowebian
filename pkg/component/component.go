@@ -2,6 +2,7 @@ package component
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"syscall/js"
 	"text/template"
@@ -17,10 +18,20 @@ type Component interface {
 	GetHeaders() map[string]string
 	GetChildren() map[string]Component
 	SetChild(key string, child Component)
+	GetChild(key string) Component
+	SetProperty(key string, value interface{})
 	Render() string
 	FuncMap() template.FuncMap
-	OnChange(e js.Value)
-	OnClick(e js.Value)
+	OnChange(e interface{})
+	OnClick(e interface{})
+	OnMessage(message *Message)
+}
+
+type Message struct {
+	From  Component
+	To    Component
+	Title string
+	Value interface{}
 }
 
 type BaseComponent struct {
@@ -38,7 +49,7 @@ func NewBaseComponent() Component {
 
 // Render html template
 func (dc *BaseComponent) Render() string {
-	return `<div>
+	return `<div id="{{.Id}}">
     {{ range $key, $value := .GetChildren }}
       {{ Generate $value }}
     {{ end }}
@@ -69,6 +80,28 @@ func Generate(c Component) string {
 	return buf.String()
 }
 
+func Register(c Component) {
+	onChangeEvt := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		evt := args[0]
+		value := evt.Get("target").Get("value")
+		c.OnChange(value)
+		return nil
+	})
+	// defer onChangeEvt.Release()
+	// Events
+	doc := js.Global().Get("document")
+	fmt.Println(c.GetId())
+	element := doc.Call("getElementById", c.GetId())
+	if element != js.Null() {
+		element.Call("addEventListener", "change", onChangeEvt)
+	} else {
+		log.Printf("Couldn't find element %s\n", c.GetId())
+	}
+	for _, value := range c.GetChildren() {
+		Register(value)
+	}
+}
+
 func (bc *BaseComponent) GetChildren() map[string]Component {
 	return bc.Children
 }
@@ -77,10 +110,17 @@ func (bc *BaseComponent) SetChild(key string, child Component) {
 	if bc.Children == nil {
 		bc.Children = make(map[string]Component)
 	}
+	child.SetId(bc.GetId() + "." + key)
 	child.SetParent(bc)
 	bc.Children[key] = child
 }
 
+func (bc *BaseComponent) GetChild(key string) Component {
+	if bc.Children == nil {
+		return nil
+	}
+	return bc.Children[key]
+}
 func (bc *BaseComponent) GetId() string {
 	return bc.Id
 }
@@ -124,10 +164,33 @@ func (bc *BaseComponent) GetHeaders() map[string]string {
 	return headers
 }
 
-func (dc *BaseComponent) OnChange(e js.Value) {
+func (bc *BaseComponent) OnChange(e interface{}) {
 	log.Printf("On Change e: %v\n", e)
 }
 
-func (dc *BaseComponent) OnClick(e js.Value) {
+func (bc *BaseComponent) OnClick(e interface{}) {
 	log.Printf("On Click e: %v\n", e)
+}
+
+func (bc *BaseComponent) OnMessage(message *Message) {
+	log.Printf("On Message m: %v\n", message)
+}
+
+func (bc *BaseComponent) SetProperty(key string, value interface{}) {
+	doc := js.Global().Get("document")
+	fmt.Println(bc.GetId())
+	element := doc.Call("getElementById", bc.GetId())
+	if element != js.Null() {
+		element.Set(key, value)
+	}
+}
+
+func (bc *BaseComponent) GetSelfElement() js.Value {
+	doc := js.Global().Get("document")
+	fmt.Println(bc.GetId())
+	element := doc.Call("getElementById", bc.GetId())
+	if element != js.Null() {
+		return element
+	}
+	return js.Value{}
 }
