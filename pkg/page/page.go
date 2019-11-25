@@ -14,14 +14,16 @@ type Page interface {
 
 type BasePage struct {
 	component.BaseComponent
+	Title string
 }
 
 func (dp *BasePage) SetTitle(title string) {
-	dp.Headers["title"] = fmt.Sprintf("<title>%s</title>", title)
+	dp.Title = title
+	dp.SetHeader("title", fmt.Sprintf("<title>%s</title>", title))
 }
 
 func (dp *BasePage) GetTitle() string {
-	return dp.Headers["title"]
+	return dp.Title
 }
 
 func NewBasePage() Page {
