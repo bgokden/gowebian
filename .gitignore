@@ -12,3 +12,4 @@
 *.out
 *.wasm
 wasm_exec.js
+*.wasm.gz
