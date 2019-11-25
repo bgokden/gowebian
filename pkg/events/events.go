@@ -1,8 +1,6 @@
 package events
 
 import (
-	"fmt"
-
 	"github.com/bgokden/go-web-lib/pkg/component"
 )
 
@@ -15,7 +13,6 @@ func Emit(m *component.Message) {
 func Listen() {
 	for {
 		m := <-messageChannel
-		fmt.Println(m)
-		m.To.OnMessage(m)
+		go m.To.OnMessage(m)
 	}
 }
