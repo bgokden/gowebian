@@ -155,4 +155,6 @@ func (bc *BaseComponent) OnMessage(message *Message) {
 
 type JsBase struct{}
 
-func (jb *JsBase) SetProperty(key string, value interface{}) {}
+func (jb *JsBase) SetProperty(key string, value interface{}) {
+	log.Printf("JsBase SetProperty: %v\n", value)
+}

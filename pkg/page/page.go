@@ -35,16 +35,16 @@ func NewBasePage() Page {
 	bp.SetTitle("Default")
 	bp.SetHeader("charset", `<meta charset="utf-8">`)
 	bp.SetHeader("viewport", `<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">`)
-	bp.SetHeader("wasm_exec", `<script src="wasm_exec.js"></script>`)
-	bp.SetHeader("WebAssembly initialize",
+	bp.SetHeader("0 wasm_exec", `<script src="wasm_exec.js"></script>`)
+	bp.SetHeader("1 WebAssembly initialize",
 		`<script>
-    if (!go) {
+      if (typeof go == 'undefined') {
         const go = new Go();
-      WebAssembly.instantiateStreaming(fetch('main.wasm'),go.importObject).then( res=> {
-        go.run(res.instance)
-      })
-    }
-  </script>`)
+        WebAssembly.instantiateStreaming(fetch('main.wasm'),go.importObject).then( res=> {
+          go.run(res.instance)
+        })
+      }
+    </script>`)
 	return bp
 }
 

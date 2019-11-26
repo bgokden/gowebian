@@ -2,7 +2,6 @@
 package component
 
 import (
-	"fmt"
 	"log"
 	"syscall/js"
 )
@@ -17,12 +16,13 @@ func Register(c Component) {
 	// defer onChangeEvt.Release()
 	// Events
 	doc := js.Global().Get("document")
-	fmt.Println(c.GetId())
 	element := doc.Call("getElementById", c.GetId())
 	if element != js.Null() {
 		element.Call("addEventListener", "change", onChangeEvt)
 	} else {
-		log.Printf("Couldn't find element %s\n", c.GetId())
+		if c.GetId() != "body" {
+			log.Printf("Couldn't find element %s\n", c.GetId())
+		}
 	}
 	for _, value := range c.GetChildren() {
 		Register(value)
@@ -31,9 +31,12 @@ func Register(c Component) {
 
 func (bc *BaseComponent) SetProperty(key string, value interface{}) {
 	doc := js.Global().Get("document")
-	fmt.Println(bc.GetId())
 	element := doc.Call("getElementById", bc.GetId())
 	if element != js.Null() {
 		element.Set(key, value)
+	} else {
+		if bc.GetId() != "body" {
+			log.Printf("Couldn't find element %s\n", bc.GetId())
+		}
 	}
 }
