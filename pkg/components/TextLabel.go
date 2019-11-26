@@ -1,8 +1,8 @@
 package components
 
 import (
+	"fmt"
 	"log"
-	"syscall/js"
 
 	"github.com/bgokden/go-web-lib/pkg/component"
 )
@@ -27,7 +27,6 @@ func (hc *TextLabel) Render() string {
 }
 
 func (hc *TextLabel) OnMessage(m *component.Message) {
-	hc.Value = m.Value.(js.Value).String()
-	hc.SetProperty("innerHTML", hc.Value)
+	hc.SetProperty("innerHTML", fmt.Sprintf("%v", hc.Value))
 	log.Printf("TextLabel m: %v\n", m.Value)
 }

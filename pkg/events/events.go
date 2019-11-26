@@ -10,9 +10,10 @@ func Emit(m *component.Message) {
 	messageChannel <- m
 }
 
-func Listen() {
+func Listen() error {
 	for {
 		m := <-messageChannel
 		go m.To.OnMessage(m)
 	}
+	return nil
 }

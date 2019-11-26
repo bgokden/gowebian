@@ -2,9 +2,7 @@ package component
 
 import (
 	"bytes"
-	"fmt"
 	"log"
-	"syscall/js"
 	"text/template"
 )
 
@@ -35,6 +33,7 @@ type Message struct {
 }
 
 type BaseComponent struct {
+	JsBase
 	Id       string
 	Parent   Component
 	Headers  map[string]string
@@ -78,28 +77,6 @@ func Generate(c Component) string {
 		return err.Error()
 	}
 	return buf.String()
-}
-
-func Register(c Component) {
-	onChangeEvt := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		evt := args[0]
-		value := evt.Get("target").Get("value")
-		c.OnChange(value)
-		return nil
-	})
-	// defer onChangeEvt.Release()
-	// Events
-	doc := js.Global().Get("document")
-	fmt.Println(c.GetId())
-	element := doc.Call("getElementById", c.GetId())
-	if element != js.Null() {
-		element.Call("addEventListener", "change", onChangeEvt)
-	} else {
-		log.Printf("Couldn't find element %s\n", c.GetId())
-	}
-	for _, value := range c.GetChildren() {
-		Register(value)
-	}
 }
 
 func (bc *BaseComponent) GetChildren() map[string]Component {
@@ -176,21 +153,6 @@ func (bc *BaseComponent) OnMessage(message *Message) {
 	log.Printf("On Message m: %v\n", message)
 }
 
-func (bc *BaseComponent) SetProperty(key string, value interface{}) {
-	doc := js.Global().Get("document")
-	fmt.Println(bc.GetId())
-	element := doc.Call("getElementById", bc.GetId())
-	if element != js.Null() {
-		element.Set(key, value)
-	}
-}
+type JsBase struct{}
 
-func (bc *BaseComponent) GetSelfElement() js.Value {
-	doc := js.Global().Get("document")
-	fmt.Println(bc.GetId())
-	element := doc.Call("getElementById", bc.GetId())
-	if element != js.Null() {
-		return element
-	}
-	return js.Value{}
-}
+func (jb *JsBase) SetProperty(key string, value interface{}) {}

@@ -1,8 +1,8 @@
 #!/bin/sh
 path=$1
 # project=$2
-GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o $path/main.wasm $path/main.go \
-  & gzip --best -k -f $path/main.wasm
+GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o $path/main.wasm $path/main.go
+gzip --best -k -f $path/main.wasm
 
 # tinygo build -o $path/main.wasm -target wasm $path/main.go
 

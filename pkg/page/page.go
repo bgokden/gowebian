@@ -2,6 +2,7 @@ package page
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/bgokden/go-web-lib/pkg/component"
 )
@@ -10,30 +11,32 @@ type Page interface {
 	component.Component
 	SetTitle(title string)
 	GetTitle() string
+	Load(content string) error
 }
 
 type BasePage struct {
 	component.BaseComponent
+	Loader
 	Title string
 }
 
-func (dp *BasePage) SetTitle(title string) {
-	dp.Title = title
-	dp.SetHeader("title", fmt.Sprintf("<title>%s</title>", title))
+func (bp *BasePage) SetTitle(title string) {
+	bp.Title = title
+	bp.SetHeader("title", fmt.Sprintf("<title>%s</title>", title))
 }
 
-func (dp *BasePage) GetTitle() string {
-	return dp.Title
+func (bp *BasePage) GetTitle() string {
+	return bp.Title
 }
 
 func NewBasePage() Page {
-	dp := &BasePage{}
-	dp.SetId("body")
-	dp.SetTitle("Default")
-	dp.SetHeader("charset", `<meta charset="utf-8">`)
-	dp.SetHeader("viewport", `<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">`)
-	dp.SetHeader("wasm_exec", `<script src="wasm_exec.js"></script>`)
-	dp.SetHeader("WebAssembly initialize",
+	bp := &BasePage{}
+	bp.SetId("body")
+	bp.SetTitle("Default")
+	bp.SetHeader("charset", `<meta charset="utf-8">`)
+	bp.SetHeader("viewport", `<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">`)
+	bp.SetHeader("wasm_exec", `<script src="wasm_exec.js"></script>`)
+	bp.SetHeader("WebAssembly initialize",
 		`<script>
     if (!go) {
         const go = new Go();
@@ -42,7 +45,7 @@ func NewBasePage() Page {
       })
     }
   </script>`)
-	return dp
+	return bp
 }
 
 func (dp *BasePage) Render() string {
@@ -63,4 +66,11 @@ func (dp *BasePage) Render() string {
   	</body>
   </html>
   `
+}
+
+type Loader struct{}
+
+func (ld *Loader) Load(content string) error {
+	err := ioutil.WriteFile("./index.html", []byte(content), 0644)
+	return err
 }
