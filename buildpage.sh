@@ -1,6 +1,7 @@
 #!/bin/sh
 path=$1
 # project=$2
+go generate $path/main.go
 GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o $path/main.wasm $path/main.go
 gzip --best -k -f $path/main.wasm
 
