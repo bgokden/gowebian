@@ -24,6 +24,7 @@ func main() {
 	button.RegisterOnClick(func(e interface{}) {
 		list.AddChild(components.NewTextElement(fmt.Sprintf("element %d", rand.Int())))
 		log.Println("todo: list component should re-render")
+		component.ReRender(list)
 	})
 	pg.SetChild("button", button)
 	pageString := component.Generate(pg)

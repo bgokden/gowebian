@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 	"text/template"
+
+	"golang.org/x/net/html"
 )
 
 type Component interface {
@@ -170,6 +173,7 @@ func (bc *BaseComponent) OnClick(args ...interface{}) Component {
 		valIn[idx] = reflect.ValueOf(elt)
 	}
 	fnVal.Call(valIn)
+	// ReRender(bc)
 	return bc
 }
 
@@ -199,8 +203,41 @@ func (bc *BaseComponent) GetCallback(key string) interface{} {
 	return bc.Callbacks[key]
 }
 
-type JsBase struct{}
-
-func (jb *JsBase) SetProperty(key string, value interface{}) {
-	log.Printf("JsBase SetProperty: %v\n", value)
+func ReRender(c Component) error {
+	content := Generate(c)
+	log.Println(content)
+	doc, err := html.Parse(strings.NewReader(content))
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	var f func(*html.Node) error
+	f = func(n *html.Node) error {
+		for _, a := range n.Attr {
+			fmt.Println(a.Val)
+		}
+		id := ""
+		for _, a := range n.Attr {
+			if a.Key == "id" {
+				id = a.Val
+				break
+			}
+		}
+		log.Printf("Re-render elements id: %v => %v\n", id, n)
+		if id != "" {
+			for _, a := range n.Attr {
+				if a.Key != "id" {
+					c.SetProperty(a.Key, a.Val)
+				}
+			}
+			log.Printf("Re-render elements id: %v => %v\n", id, n)
+			// c.SetProperty("innerHTML", n.Data)
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				f(c)
+			}
+		}
+		return nil
+	}
+	f(doc)
+	return nil
 }
