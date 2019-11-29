@@ -3,8 +3,10 @@ package page
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/bgokden/go-web-lib/pkg/component"
+	"golang.org/x/net/html"
 )
 
 type Page interface {
@@ -71,6 +73,10 @@ func (dp *BasePage) Render() string {
 type Loader struct{}
 
 func (ld *Loader) Load(content string) error {
-	err := ioutil.WriteFile("./index.html", []byte(content), 0644)
+	_, err := html.Parse(strings.NewReader(content))
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("./index.html", []byte(content), 0644)
 	return err
 }

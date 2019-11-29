@@ -21,6 +21,7 @@ func (hc *TextLabel) Render() string {
 	return `<label id="{{.Id}}" for="...">{{.Value}}</label>`
 }
 
-func (hc *TextLabel) OnMessage(m *component.Message) {
+func (hc *TextLabel) OnMessage(m *component.Message) component.Component {
 	hc.SetProperty("innerHTML", fmt.Sprintf("%v", m.Value))
+	return hc
 }

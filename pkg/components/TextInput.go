@@ -18,7 +18,7 @@ func NewTextInput() component.Component {
 	}
 }
 
-func (hc *TextInput) OnChange(e interface{}) {
+func (hc *TextInput) OnChange(e interface{}) component.Component {
 	log.Printf("e: %v\n", e)
 	events.Emit(&component.Message{
 		From:  hc,
@@ -26,6 +26,7 @@ func (hc *TextInput) OnChange(e interface{}) {
 		Title: "input Change",
 		Value: e,
 	})
+	return hc
 }
 
 func (hc *TextInput) Render() string {
