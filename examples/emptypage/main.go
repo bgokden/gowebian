@@ -8,14 +8,25 @@ import (
 
 	"github.com/bgokden/go-web-lib/pkg/component"
 	"github.com/bgokden/go-web-lib/pkg/components"
+	"github.com/bgokden/go-web-lib/pkg/events"
 	"github.com/bgokden/go-web-lib/pkg/page"
 )
 
 func main() {
 	pg := page.NewBasePage()
 	pg.SetTitle("Empty Page")
-	pg.SetChild("label", components.NewTextLabel())
-	pg.SetChild("input", components.NewTextInput())
+	textlabel := components.NewTextLabel()
+	textInput := components.NewTextInput()
+	textInput.SetCallback("change", func(e interface{}) {
+		events.Emit(&component.Message{
+			From:  textInput,
+			To:    textlabel,
+			Title: "input Change",
+			Value: e,
+		})
+	})
+	pg.SetChild("label", textlabel)
+	pg.SetChild("input", textInput)
 	list := components.NewUnorderedList()
 	textElement := components.NewTextElement("element 0")
 	textElement.RegisterOnClick(func(e interface{}) {
