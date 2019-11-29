@@ -28,12 +28,12 @@ type Component interface {
 	SetPropertyWithId(id string, key string, value interface{})
 	Render() string
 	FuncMap() template.FuncMap
-	OnChange(e interface{}) Component
-	OnClick(e ...interface{}) Component
 	OnMessage(message *Message) Component
 	RegisterOnClick(callback interface{}) Component
 	SetCallback(key string, callback interface{})
 	GetCallback(key string) interface{}
+	GetCallbacks() map[string]interface{}
+	Callback(event string, args ...interface{}) Component
 	Register(c Component)
 }
 
@@ -172,6 +172,7 @@ func (bc *BaseComponent) GetHeaders() map[string]string {
 	return headers
 }
 
+/*
 func (bc *BaseComponent) OnChange(e interface{}) Component {
 	log.Printf("On Change e: %v\n", e)
 	return bc
@@ -179,6 +180,18 @@ func (bc *BaseComponent) OnChange(e interface{}) Component {
 
 func (bc *BaseComponent) OnClick(args ...interface{}) Component {
 	fnVal := reflect.ValueOf(bc.GetCallback("click"))
+	valIn := make([]reflect.Value, len(args), len(args))
+	for idx, elt := range args {
+		valIn[idx] = reflect.ValueOf(elt)
+	}
+	fnVal.Call(valIn)
+	// ReRender(bc)
+	return bc
+}
+*/
+
+func (bc *BaseComponent) Callback(event string, args ...interface{}) Component {
+	fnVal := reflect.ValueOf(bc.GetCallback(event))
 	valIn := make([]reflect.Value, len(args), len(args))
 	for idx, elt := range args {
 		valIn[idx] = reflect.ValueOf(elt)
@@ -212,6 +225,10 @@ func (bc *BaseComponent) GetCallback(key string) interface{} {
 		}
 	}
 	return bc.Callbacks[key]
+}
+
+func (bc *BaseComponent) GetCallbacks() map[string]interface{} {
+	return bc.Callbacks
 }
 
 func ReRender(c Component) error {
