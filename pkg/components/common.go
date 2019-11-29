@@ -18,7 +18,7 @@ func NewP(text string) component.Component {
 }
 
 func (p *P) Render() string {
-	return `<{{.Tag}} id="{{.Id}}">{{.Value}}</{{.Tag}}>`
+	return `<{{.Tag}} id="{{.GetId}}">{{.Value}}</{{.Tag}}>`
 }
 
 type Button struct {
@@ -35,5 +35,5 @@ func NewButton(text string) component.Component {
 }
 
 func (b *Button) Render() string {
-	return `<{{.Tag}} id="{{.Id}}" type="button">{{.Value}}</{{.Tag}}>`
+	return `<{{.Tag}} id="{{.GetId}}" type="button">{{.Value}}</{{.Tag}}>`
 }

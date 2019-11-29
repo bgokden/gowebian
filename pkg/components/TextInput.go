@@ -30,5 +30,5 @@ func (hc *TextInput) OnChange(e interface{}) component.Component {
 }
 
 func (hc *TextInput) Render() string {
-	return `<input id="{{.Id}}" value="{{.Value}}" placeholder="Name input">`
+	return `<input id="{{.GetId}}" value="{{.Value}}" placeholder="Name input">`
 }

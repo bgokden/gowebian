@@ -13,7 +13,8 @@ import (
 
 type Component interface {
 	GetId() string
-	SetId(string)
+	GetKey() string
+	SetKey(string)
 	SetParent(c Component)
 	GetParent() Component
 	SetHeader(key, value string)
@@ -24,6 +25,7 @@ type Component interface {
 	GetChild(key string) Component
 	AddChild(child Component)
 	SetProperty(key string, value interface{})
+	SetPropertyWithId(id string, key string, value interface{})
 	Render() string
 	FuncMap() template.FuncMap
 	OnChange(e interface{}) Component
@@ -32,6 +34,7 @@ type Component interface {
 	RegisterOnClick(callback interface{}) Component
 	SetCallback(key string, callback interface{})
 	GetCallback(key string) interface{}
+	Register(c Component)
 }
 
 type Message struct {
@@ -44,6 +47,7 @@ type Message struct {
 type BaseComponent struct {
 	JsBase
 	Id        string
+	Key       string
 	Tag       string
 	Parent    Component
 	Headers   map[string]string
@@ -61,7 +65,7 @@ func NewBaseComponent() Component {
 
 // Render html template
 func (dc *BaseComponent) Render() string {
-	return `<{{.Tag}} id="{{.Id}}">
+	return `<{{.Tag}} id="{{.GetId}}">
 	{{ range $key, $value := .GetChildren }}
   	{{ Generate $value }}
 	{{ end }}
@@ -100,7 +104,7 @@ func (bc *BaseComponent) SetChild(key string, child Component) {
 	if bc.Children == nil {
 		bc.Children = make(map[string]Component)
 	}
-	child.SetId(bc.GetId() + "." + key)
+	child.SetKey(key)
 	child.SetParent(bc)
 	bc.Children[key] = child
 }
@@ -119,11 +123,18 @@ func (bc *BaseComponent) AddChild(child Component) {
 }
 
 func (bc *BaseComponent) GetId() string {
-	return bc.Id
+	if bc.Parent != nil {
+		return fmt.Sprintf("%s.%s", bc.Parent.GetId(), bc.Key)
+	}
+	return bc.Key
 }
 
-func (bc *BaseComponent) SetId(id string) {
-	bc.Id = id
+func (bc *BaseComponent) GetKey() string {
+	return bc.Key
+}
+
+func (bc *BaseComponent) SetKey(key string) {
+	bc.Key = key
 }
 
 func (bc *BaseComponent) GetParent() Component {
@@ -205,39 +216,11 @@ func (bc *BaseComponent) GetCallback(key string) interface{} {
 
 func ReRender(c Component) error {
 	content := Generate(c)
-	log.Println(content)
-	doc, err := html.Parse(strings.NewReader(content))
+	_, err := html.Parse(strings.NewReader(content))
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	var f func(*html.Node) error
-	f = func(n *html.Node) error {
-		for _, a := range n.Attr {
-			fmt.Println(a.Val)
-		}
-		id := ""
-		for _, a := range n.Attr {
-			if a.Key == "id" {
-				id = a.Val
-				break
-			}
-		}
-		log.Printf("Re-render elements id: %v => %v\n", id, n)
-		if id != "" {
-			for _, a := range n.Attr {
-				if a.Key != "id" {
-					c.SetProperty(a.Key, a.Val)
-				}
-			}
-			log.Printf("Re-render elements id: %v => %v\n", id, n)
-			// c.SetProperty("innerHTML", n.Data)
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				f(c)
-			}
-		}
-		return nil
-	}
-	f(doc)
+	c.SetProperty("outerHTML", content)
 	return nil
 }

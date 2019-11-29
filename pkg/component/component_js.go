@@ -6,7 +6,7 @@ import (
 	"syscall/js"
 )
 
-func Register(c Component) {
+func (bc *BaseComponent) Register(c Component) {
 	onChangeEvt := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		evt := args[0]
 		value := evt.Get("target").Get("value")
@@ -33,7 +33,7 @@ func Register(c Component) {
 	}
 
 	for _, value := range c.GetChildren() {
-		Register(value)
+		value.Register(value)
 	}
 }
 
@@ -45,6 +45,18 @@ func (bc *BaseComponent) SetProperty(key string, value interface{}) {
 	} else {
 		if bc.GetId() != "body" {
 			log.Printf("Couldn't find element %s\n", bc.GetId())
+		}
+	}
+}
+
+func (bc *BaseComponent) SetPropertyWithId(id string, key string, value interface{}) {
+	doc := js.Global().Get("document")
+	element := doc.Call("getElementById", id)
+	if element != js.Null() {
+		element.Set(key, value)
+	} else {
+		if id != "body" {
+			log.Printf("Couldn't find element %s\n", id)
 		}
 	}
 }

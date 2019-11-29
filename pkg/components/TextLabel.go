@@ -18,7 +18,7 @@ func NewTextLabel() component.Component {
 }
 
 func (hc *TextLabel) Render() string {
-	return `<label id="{{.Id}}" for="...">{{.Value}}</label>`
+	return `<label id="{{.GetId}}" for="...">{{.Value}}</label>`
 }
 
 func (hc *TextLabel) OnMessage(m *component.Message) component.Component {
