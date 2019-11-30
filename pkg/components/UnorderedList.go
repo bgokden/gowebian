@@ -10,7 +10,7 @@ type UnorderedList struct {
 	component.BaseComponent
 }
 
-func NewUnorderedList() component.Component {
+func NewUnorderedList() *UnorderedList {
 	e := &UnorderedList{}
 	e.Tag = "ul"
 	return e
@@ -25,7 +25,7 @@ type ListElement struct {
 	component.BaseComponent
 }
 
-func NewListElement() component.Component {
+func NewListElement() *ListElement {
 	e := &ListElement{}
 	e.Tag = "li"
 	return e

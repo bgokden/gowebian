@@ -9,7 +9,7 @@ type P struct {
 	Value string
 }
 
-func NewP(text string) component.Component {
+func NewP(text string) *P {
 	e := &P{
 		Value: text,
 	}

@@ -2,8 +2,9 @@
 path=$1
 # project=$2
 go generate $path/main.go
-GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o $path/main.wasm $path/main.go
-gzip --best -k -f $path/main.wasm
+GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o $path/public/main.wasm $path/main.go
+gzip --best -k -f $path/public/main.wasm
+cp $(go env GOROOT)/misc/wasm/wasm_exec.js $path/public/
 
 # tinygo build -o $path/main.wasm -target wasm $path/main.go
 

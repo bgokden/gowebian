@@ -9,7 +9,7 @@ type TextInput struct {
 	Value string
 }
 
-func NewTextInput() component.Component {
+func NewTextInput() *TextInput {
 	return &TextInput{
 		Value: "...",
 	}

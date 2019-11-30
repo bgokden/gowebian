@@ -11,7 +11,7 @@ type TextLabel struct {
 	Value string
 }
 
-func NewTextLabel() component.Component {
+func NewTextLabel() *TextLabel {
 	return &TextLabel{
 		Value: "...",
 	}

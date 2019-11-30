@@ -77,6 +77,6 @@ func (ld *Loader) Load(content string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("./index.html", []byte(content), 0644)
+	err = ioutil.WriteFile("./public/index.html", []byte(content), 0644)
 	return err
 }
