@@ -21,6 +21,7 @@ type Component interface {
 	GetHeader(key string) string
 	GetHeaders() map[string]string
 	GetChildren() map[string]Component
+	HasChildren() bool
 	SetChild(key string, child Component)
 	GetChild(key string) Component
 	AddChild(child Component)
@@ -98,6 +99,13 @@ func Generate(c Component) string {
 
 func (bc *BaseComponent) GetChildren() map[string]Component {
 	return bc.Children
+}
+
+func (bc *BaseComponent) HasChildren() bool {
+	if bc.Children == nil {
+		return false
+	}
+	return len(bc.Children) > 0
 }
 
 func (bc *BaseComponent) SetChild(key string, child Component) {

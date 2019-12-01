@@ -33,13 +33,23 @@ func (bp *BasePage) GetTitle() string {
 
 func NewBasePage() Page {
 	bp := &BasePage{}
+	InitDefaults(bp)
+	return bp
+}
+
+func NewPage() Page {
+	return NewBasePage()
+}
+
+func InitDefaults(bp Page) {
 	bp.SetKey("body")
 	bp.SetTitle("Default")
 	bp.SetHeader("charset", `<meta charset="utf-8">`)
 	bp.SetHeader("viewport", `<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">`)
-	bp.SetHeader("0 wasm_exec", `<script src="wasm_exec.js"></script>`)
-	bp.SetHeader("1 WebAssembly initialize",
-		`<script>
+	bp.SetHeader("x-ua-compatible", `<meta http-equiv="x-ua-compatible" content="ie=edge">`)
+	bp.SetHeader("WebAssembly initialize",
+		`<script src="wasm_exec.js"></script>
+    <script>
       if (typeof go == 'undefined') {
         const go = new Go();
         WebAssembly.instantiateStreaming(fetch('main.wasm'),go.importObject).then( res=> {
@@ -47,7 +57,6 @@ func NewBasePage() Page {
         })
       }
     </script>`)
-	return bp
 }
 
 func (dp *BasePage) Render() string {
@@ -55,7 +64,7 @@ func (dp *BasePage) Render() string {
   <!doctype html>
   <html lang="en">
   	<head>
-    {{ range $key, $value := .Headers }}
+    {{ range $key, $value := .GetHeaders }}
       {{ $value }}
     {{ end }}
   	<style>
