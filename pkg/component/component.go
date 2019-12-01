@@ -15,6 +15,8 @@ type Component interface {
 	GetId() string
 	GetKey() string
 	SetKey(string)
+	GetTag() string
+	SetTag(string)
 	SetParent(c Component)
 	GetParent() Component
 	SetHeader(key, value string)
@@ -36,6 +38,9 @@ type Component interface {
 	GetCallbacks() map[string]interface{}
 	Callback(event string, args ...interface{}) Component
 	Register(c Component)
+	SetAttribute(key, value string)
+	GetAttribute(key string) string
+	GetAttributes() map[string]string
 }
 
 type Message struct {
@@ -47,18 +52,19 @@ type Message struct {
 
 type BaseComponent struct {
 	JsBase
-	Id        string
-	Key       string
-	Tag       string
-	Parent    Component
-	Headers   map[string]string
-	Children  map[string]Component
-	Iterator  uint
-	Callbacks map[string]interface{}
+	Key        string
+	Tag        string
+	Parent     Component
+	Headers    map[string]string
+	Children   map[string]Component
+	Iterator   uint
+	Callbacks  map[string]interface{}
+	Attributes map[string]string
 }
 
 func NewBaseComponent() Component {
 	return &BaseComponent{
+		Tag:      "div",
 		Children: make(map[string]Component),
 		Iterator: 0,
 	}
@@ -66,11 +72,11 @@ func NewBaseComponent() Component {
 
 // Render html template
 func (dc *BaseComponent) Render() string {
-	return `<{{.Tag}} id="{{.GetId}}">
+	return `<{{.GetTag}} id="{{.GetId}}" {{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
 	{{ range $key, $value := .GetChildren }}
   	{{ Generate $value }}
 	{{ end }}
-</{{.Tag}}>`
+</{{.GetTag}}>`
 }
 
 func (dc *BaseComponent) FuncMap() template.FuncMap {
@@ -145,6 +151,17 @@ func (bc *BaseComponent) SetKey(key string) {
 	bc.Key = key
 }
 
+func (bc *BaseComponent) GetTag() string {
+	if bc.Tag == "" {
+		return "div"
+	}
+	return bc.Tag
+}
+
+func (bc *BaseComponent) SetTag(tag string) {
+	bc.Tag = tag
+}
+
 func (bc *BaseComponent) GetParent() Component {
 	return bc.Parent
 }
@@ -180,23 +197,30 @@ func (bc *BaseComponent) GetHeaders() map[string]string {
 	return headers
 }
 
-/*
-func (bc *BaseComponent) OnChange(e interface{}) Component {
-	log.Printf("On Change e: %v\n", e)
-	return bc
+func (bc *BaseComponent) SetAttribute(key, value string) {
+	if key != "id" {
+		if bc.Attributes == nil {
+			bc.Attributes = make(map[string]string)
+		}
+		bc.Attributes[key] = value
+	}
+}
+func (bc *BaseComponent) GetAttribute(key string) string {
+	if key == "id" {
+		return bc.GetId()
+	}
+	if bc.Attributes == nil {
+		return ""
+	}
+	return bc.Attributes[key]
 }
 
-func (bc *BaseComponent) OnClick(args ...interface{}) Component {
-	fnVal := reflect.ValueOf(bc.GetCallback("click"))
-	valIn := make([]reflect.Value, len(args), len(args))
-	for idx, elt := range args {
-		valIn[idx] = reflect.ValueOf(elt)
+func (bc *BaseComponent) GetAttributes() map[string]string {
+	if bc.Attributes == nil {
+		return make(map[string]string)
 	}
-	fnVal.Call(valIn)
-	// ReRender(bc)
-	return bc
+	return bc.Attributes
 }
-*/
 
 func (bc *BaseComponent) Callback(event string, args ...interface{}) Component {
 	fnVal := reflect.ValueOf(bc.GetCallback(event))
@@ -248,4 +272,12 @@ func ReRender(c Component) error {
 	}
 	c.SetProperty("outerHTML", content)
 	return nil
+}
+
+func NewComponent(tag, class, style string) Component {
+	c := NewBaseComponent()
+	c.SetTag(tag)
+	c.SetAttribute("class", class)
+	c.SetAttribute("style", style)
+	return c
 }

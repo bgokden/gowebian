@@ -29,7 +29,7 @@ func (p *Page) Render() string {
 		<!-- Material Design Bootstrap -->
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.11/css/mdb.min.css" rel="stylesheet">
   	</head>
-  	<body>
+  	<body {{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
 		{{if .HasChildren }}
 	    {{ range $key, $value := .GetChildren }}
 	      {{ Generate $value }}

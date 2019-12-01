@@ -37,3 +37,20 @@ func NewButton(text string) component.Component {
 func (b *Button) Render() string {
 	return `<{{.Tag}} id="{{.GetId}}" type="button">{{.Value}}</{{.Tag}}>`
 }
+
+type Text struct {
+	component.BaseComponent
+	Value string
+}
+
+func NewText(text string) *Text {
+	t := &Text{
+		Value: text,
+	}
+	t.SetTag("")
+	return t
+}
+
+func (t *Text) Render() string {
+	return `{{.Value}}`
+}
