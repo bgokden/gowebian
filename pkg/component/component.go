@@ -70,9 +70,9 @@ func NewBaseComponent() Component {
 	}
 }
 
-// Render html template
+// Render text/html template
 func (dc *BaseComponent) Render() string {
-	return `<{{.GetTag}} id="{{.GetId}}" {{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
+	return `<{{.GetTag}} id="{{.GetId}}"{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
 	{{ range $key, $value := .GetChildren }}
   	{{ Generate $value }}
 	{{ end }}
@@ -81,13 +81,15 @@ func (dc *BaseComponent) Render() string {
 
 func (dc *BaseComponent) FuncMap() template.FuncMap {
 	return template.FuncMap{
-		"Generate": Generate,
+		"Generate":      Generate,
+		"GenerateChild": GenerateChild,
 	}
 }
 
 func Generate(c Component) string {
 	funcMap := c.FuncMap()
 	funcMap["Generate"] = Generate
+	funcMap["GenerateChild"] = GenerateChild
 
 	templateText := c.Render()
 	tmpl, err := template.New("Render").Funcs(funcMap).Parse(templateText)
@@ -101,6 +103,14 @@ func Generate(c Component) string {
 		return err.Error()
 	}
 	return buf.String()
+}
+
+func GenerateChild(c Component, key string) string {
+	child := c.GetChild(key)
+	if child == nil {
+		return ""
+	}
+	return Generate(child)
 }
 
 func (bc *BaseComponent) GetChildren() map[string]Component {

@@ -88,7 +88,7 @@ func NewMeta(attributeMap map[string]string) *Meta {
 }
 
 func (c *Meta) Render() string {
-	return `<{{.Tag}} {{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>`
+	return `<{{.Tag}}{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>`
 }
 
 type Script struct {
@@ -108,6 +108,14 @@ func NewScript(attributeMap map[string]string, code string) *Script {
 		c.AddChild(NewText(code))
 	}
 	return c
+}
+
+func (c *Script) Render() string {
+	return `<{{.GetTag}}{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
+	{{ range $key, $value := .GetChildren }}
+  	{{ Generate $value }}
+	{{ end }}
+</{{.GetTag}}>`
 }
 
 func NewScriptFromSource(src string) *Script {

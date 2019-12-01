@@ -57,14 +57,12 @@ func InitDefaults(bp Page) {
 	}))
 	bp.SetHeader("WebAssemblyinitialize_0", components.NewScriptFromSource("wasm_exec.js"))
 	bp.SetHeader("WebAssemblyinitialize_1", components.NewScriptFromCode(
-		`<script>
-      if (typeof go == 'undefined') {
+		`if (typeof go == 'undefined') {
         const go = new Go();
         WebAssembly.instantiateStreaming(fetch('main.wasm'),go.importObject).then( res=> {
           go.run(res.instance)
         })
-      }
-    </script>`))
+      }`))
 }
 
 func (dp *BasePage) Render() string {
