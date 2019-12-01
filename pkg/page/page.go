@@ -1,11 +1,11 @@
 package page
 
 import (
-	"fmt"
 	"io/ioutil"
 	"strings"
 
 	"github.com/bgokden/go-web-lib/pkg/component"
+	"github.com/bgokden/go-web-lib/pkg/components"
 	"golang.org/x/net/html"
 )
 
@@ -24,7 +24,7 @@ type BasePage struct {
 
 func (bp *BasePage) SetTitle(title string) {
 	bp.Title = title
-	bp.SetHeader("title", fmt.Sprintf("<title>%s</title>", title))
+	bp.SetHeader("title", components.NewTitle(title))
 }
 
 func (bp *BasePage) GetTitle() string {
@@ -44,19 +44,27 @@ func NewPage() Page {
 func InitDefaults(bp Page) {
 	bp.SetKey("body")
 	bp.SetTitle("Default")
-	bp.SetHeader("charset", `<meta charset="utf-8">`)
-	bp.SetHeader("viewport", `<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">`)
-	bp.SetHeader("x-ua-compatible", `<meta http-equiv="x-ua-compatible" content="ie=edge">`)
-	bp.SetHeader("WebAssembly initialize",
-		`<script src="wasm_exec.js"></script>
-    <script>
+	bp.SetHeader("charset", components.NewMeta(map[string]string{
+		"charset": "utf-8",
+	}))
+	bp.SetHeader("viewport", components.NewMeta(map[string]string{
+		"name":    "viewport",
+		"content": "width=device-width, initial-scale=1, shrink-to-fit=no",
+	}))
+	bp.SetHeader("x-ua-compatible", components.NewMeta(map[string]string{
+		"http-equiv": "x-ua-compatible",
+		"content":    "ie=edge",
+	}))
+	bp.SetHeader("WebAssemblyinitialize_0", components.NewScriptFromSource("wasm_exec.js"))
+	bp.SetHeader("WebAssemblyinitialize_1", components.NewScriptFromCode(
+		`<script>
       if (typeof go == 'undefined') {
         const go = new Go();
         WebAssembly.instantiateStreaming(fetch('main.wasm'),go.importObject).then( res=> {
           go.run(res.instance)
         })
       }
-    </script>`)
+    </script>`))
 }
 
 func (dp *BasePage) Render() string {
@@ -65,7 +73,7 @@ func (dp *BasePage) Render() string {
   <html lang="en">
   	<head>
     {{ range $key, $value := .GetHeaders }}
-      {{ $value }}
+      {{ Generate $value }}
     {{ end }}
   	<style>
   	</style>

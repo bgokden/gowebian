@@ -19,9 +19,9 @@ type Component interface {
 	SetTag(string)
 	SetParent(c Component)
 	GetParent() Component
-	SetHeader(key, value string)
-	GetHeader(key string) string
-	GetHeaders() map[string]string
+	SetHeader(key string, value Component)
+	GetHeader(key string) Component
+	GetHeaders() map[string]Component
 	GetChildren() map[string]Component
 	HasChildren() bool
 	SetChild(key string, child Component)
@@ -55,7 +55,7 @@ type BaseComponent struct {
 	Key        string
 	Tag        string
 	Parent     Component
-	Headers    map[string]string
+	Headers    map[string]Component
 	Children   map[string]Component
 	Iterator   uint
 	Callbacks  map[string]interface{}
@@ -170,22 +170,22 @@ func (bc *BaseComponent) SetParent(c Component) {
 	bc.Parent = c
 }
 
-func (bc *BaseComponent) SetHeader(key, value string) {
+func (bc *BaseComponent) SetHeader(key string, value Component) {
 	if bc.Headers == nil {
-		bc.Headers = make(map[string]string)
+		bc.Headers = make(map[string]Component)
 	}
 	bc.Headers[key] = value
 }
 
-func (bc *BaseComponent) GetHeader(key string) string {
+func (bc *BaseComponent) GetHeader(key string) Component {
 	if bc.Headers == nil {
-		return ""
+		return NewBaseComponent()
 	}
 	return bc.Headers[key]
 }
 
-func (bc *BaseComponent) GetHeaders() map[string]string {
-	headers := make(map[string]string)
+func (bc *BaseComponent) GetHeaders() map[string]Component {
+	headers := make(map[string]Component)
 	for _, child := range bc.GetChildren() {
 		for key, value := range child.GetHeaders() {
 			headers[key] = value
