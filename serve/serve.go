@@ -11,6 +11,12 @@ import (
 )
 
 func main() {
+	args := os.Args
+	folder := "."
+	if len(args) >= 2 {
+		folder = args[1]
+	}
+
 	port := 8080
 	for {
 		addr := fmt.Sprintf(":%d", port)
@@ -21,7 +27,7 @@ func main() {
 			continue
 		}
 		fmt.Printf("Listening at %s\n", addr)
-		log.Fatal(http.Serve(listener, logger(http.FileServer(http.Dir(".")))))
+		log.Fatal(http.Serve(listener, logger(http.FileServer(http.Dir(folder)))))
 	}
 }
 

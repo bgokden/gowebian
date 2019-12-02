@@ -1,4 +1,4 @@
-module github.com/bgokden/go-web-lib
+module github.com/bgokden/gowebian
 
 go 1.13
 

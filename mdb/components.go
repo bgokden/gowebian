@@ -1,6 +1,6 @@
 package mdb
 
-import "github.com/bgokden/go-web-lib/pkg/component"
+import "github.com/bgokden/gowebian/pkg/component"
 
 type Header struct {
 	component.BaseComponent

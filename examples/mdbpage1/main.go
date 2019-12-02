@@ -4,8 +4,8 @@ package main
 import (
 	"log"
 
-	"github.com/bgokden/go-web-lib/mdb"
-	"github.com/bgokden/go-web-lib/pkg/component"
+	"github.com/bgokden/gowebian/mdb"
+	"github.com/bgokden/gowebian/pkg/component"
 )
 
 func main() {

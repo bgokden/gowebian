@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bgokden/go-web-lib/mdb"
-	"github.com/bgokden/go-web-lib/pkg/component"
-	"github.com/bgokden/go-web-lib/pkg/components"
+	"github.com/bgokden/gowebian/mdb"
+	"github.com/bgokden/gowebian/pkg/component"
+	"github.com/bgokden/gowebian/pkg/components"
 )
 
 func main() {

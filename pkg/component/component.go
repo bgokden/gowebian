@@ -238,7 +238,7 @@ func (bc *BaseComponent) Callback(event string, args ...interface{}) Component {
 	for idx, elt := range args {
 		valIn[idx] = reflect.ValueOf(elt)
 	}
-	fnVal.Call(valIn)
+	go fnVal.Call(valIn)
 	// ReRender(bc)
 	return bc
 }

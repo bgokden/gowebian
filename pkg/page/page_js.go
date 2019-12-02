@@ -2,7 +2,7 @@
 package page
 
 import (
-	"github.com/bgokden/go-web-lib/pkg/events"
+	"github.com/bgokden/gowebian/pkg/events"
 )
 
 func (bp *BasePage) Load(content string) error {

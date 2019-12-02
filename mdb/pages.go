@@ -1,7 +1,7 @@
 package mdb
 
 import (
-	"github.com/bgokden/go-web-lib/pkg/page"
+	"github.com/bgokden/gowebian/pkg/page"
 )
 
 type Page struct {

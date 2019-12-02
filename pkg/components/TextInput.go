@@ -1,7 +1,7 @@
 package components
 
 import (
-	"github.com/bgokden/go-web-lib/pkg/component"
+	"github.com/bgokden/gowebian/pkg/component"
 )
 
 type TextInput struct {
