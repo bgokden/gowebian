@@ -10,7 +10,7 @@ func (bc *BaseComponent) Register(c Component) {
 	// Events
 	doc := js.Global().Get("document")
 	element := doc.Call("getElementById", c.GetId())
-	if element != js.Null() {
+	if !element.IsNull() {
 		callbacks := c.GetCallbacks()
 		if callbacks != nil {
 			for key, _ := range callbacks {
@@ -38,7 +38,7 @@ func (bc *BaseComponent) Register(c Component) {
 func (bc *BaseComponent) SetProperty(key string, value interface{}) {
 	doc := js.Global().Get("document")
 	element := doc.Call("getElementById", bc.GetId())
-	if element != js.Null() {
+	if !element.IsNull() {
 		element.Set(key, value)
 	} else {
 		if bc.GetId() != "body" {
@@ -50,7 +50,7 @@ func (bc *BaseComponent) SetProperty(key string, value interface{}) {
 func (bc *BaseComponent) SetPropertyWithId(id string, key string, value interface{}) {
 	doc := js.Global().Get("document")
 	element := doc.Call("getElementById", id)
-	if element != js.Null() {
+	if !element.IsNull() {
 		element.Set(key, value)
 	} else {
 		if id != "body" {
