@@ -56,12 +56,6 @@ func NewMeta(attributeMap map[string]string) *Meta {
 	return m
 }
 
-/*
-func (m *Meta) Render() string {
-	return `<{{.Tag}}{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>`
-}
-*/
-
 type Script struct {
 	component.BaseComponent
 	Code string
@@ -79,17 +73,6 @@ func NewScript(attributeMap map[string]string, code string) *Script {
 	return c
 }
 
-/*
-func (c *Script) Render() string {
-	return `<{{.GetTag}}{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
-	{{ .GetValue }}
-	{{ range $key, $value := .GetChildren }}
-  	{{ Generate $value }}
-	{{ end }}
-</{{.GetTag}}>`
-}
-*/
-
 func NewScriptFromSource(src string) *Script {
 	return NewScript(map[string]string{
 		"src": src,
@@ -98,4 +81,24 @@ func NewScriptFromSource(src string) *Script {
 
 func NewScriptFromCode(code string) *Script {
 	return NewScript(nil, code)
+}
+
+type Head struct {
+	component.BaseComponent
+}
+
+func NewHead() *Head {
+	h := &Head{}
+	h.SetTag("head")
+	return h
+}
+
+type Body struct {
+	component.BaseComponent
+}
+
+func NewBody() *Body {
+	b := &Body{}
+	b.SetTag("body")
+	return b
 }

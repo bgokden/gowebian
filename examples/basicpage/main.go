@@ -14,6 +14,7 @@ import (
 
 func main() {
 	pg := page.NewBasePage()
+	body := pg.GetChild("body")
 	pg.SetTitle("Empty Page")
 	textInput := components.NewTextInput("...")
 	textlabel := components.NewTextLabel("enter input")
@@ -25,8 +26,8 @@ func main() {
 			Value: e,
 		})
 	})
-	pg.SetChild("label", textlabel)
-	pg.SetChild("input", textInput)
+	body.SetChild("label", textlabel)
+	body.SetChild("input", textInput)
 	textlabel.SetAttribute("for", textInput.GetId())
 	list := components.NewUnorderedList()
 	textElement := components.NewTextElement("element 0")
@@ -35,7 +36,7 @@ func main() {
 	})
 	list.AddChild(textElement)
 	list.AddChild(components.NewTextElement("element 1"))
-	pg.SetChild("list", list)
+	body.SetChild("list", list)
 	button := components.NewButton("click me!")
 	button.RegisterOnClick(func(e interface{}) {
 		list.AddChild(components.NewTextElement(fmt.Sprintf("element %d", rand.Int())))
@@ -43,7 +44,7 @@ func main() {
 		component.ReRender(list)
 		list.Register(list)
 	})
-	pg.SetChild("button", button)
+	body.SetChild("button", button)
 	pageString := component.Generate(pg)
 	err := pg.Load(pageString)
 	if err != nil {

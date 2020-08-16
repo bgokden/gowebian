@@ -13,22 +13,22 @@ type Page interface {
 	component.Component
 	SetTitle(title string)
 	GetTitle() string
+	SetHeader(key string, value component.Component)
+	GetHeader(key string) component.Component
 	Load(content string) error
 }
 
 type BasePage struct {
 	component.BaseComponent
 	Loader
-	Title string
 }
 
 func (bp *BasePage) SetTitle(title string) {
-	bp.Title = title
 	bp.SetHeader("title", components.NewTitle(title))
 }
 
 func (bp *BasePage) GetTitle() string {
-	return bp.Title
+	return bp.GetHeader("title").GetValue()
 }
 
 func NewBasePage() Page {
@@ -42,7 +42,10 @@ func NewPage() Page {
 }
 
 func InitDefaults(bp Page) {
-	bp.SetKey("body")
+	bp.SetKey("html")
+	bp.SetAttribute("lang", "en")
+	bp.SetChild("head", components.NewHead())
+	bp.SetChild("body", components.NewBody())
 	bp.SetTitle("Default")
 	bp.SetHeader("charset", components.NewMeta(map[string]string{
 		"charset": "utf-8",
@@ -65,24 +68,12 @@ func InitDefaults(bp Page) {
       }`))
 }
 
-func (dp *BasePage) Render() string {
-	return `
-  <!doctype html>
-  <html lang="en">
-  	<head>
-    {{ range $key, $value := .GetHeaders }}
-      {{ Generate $value }}
-    {{ end }}
-  	<style>
-  	</style>
-  	</head>
-  	<body {{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
-    {{ range $key, $value := .GetChildrenList }}
-      {{ Generate $value }}
-    {{ end }}
-  	</body>
-  </html>
-  `
+func (bp *BasePage) SetHeader(key string, value component.Component) {
+	bp.GetChild("head").SetChild(key, value)
+}
+
+func (bp *BasePage) GetHeader(key string) component.Component {
+	return bp.GetChild("head").GetChild(key)
 }
 
 type Loader struct{}

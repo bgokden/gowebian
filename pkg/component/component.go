@@ -1,12 +1,10 @@
 package component
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"reflect"
 	"strings"
-	"text/template"
 
 	"github.com/yosssi/gohtml"
 	"golang.org/x/net/html"
@@ -20,9 +18,6 @@ type Component interface {
 	SetTag(string)
 	SetParent(c Component)
 	GetParent() Component
-	SetHeader(key string, value Component)
-	GetHeader(key string) Component
-	GetHeaders() map[string]Component
 	GetChildren() map[string]Component
 	GetChildrenList() []Component
 	HasChildren() bool
@@ -32,7 +27,6 @@ type Component interface {
 	SetProperty(key string, value interface{})
 	SetPropertyWithId(id string, key string, value interface{})
 	Render() string
-	FuncMap() template.FuncMap
 	OnMessage(message *Message) Component
 	RegisterOnClick(callback interface{}) Component
 	SetCallback(key string, callback interface{})
@@ -62,7 +56,6 @@ type BaseComponent struct {
 	Tag              string
 	Value            string
 	Parent           Component
-	Headers          map[string]Component
 	Children         map[string]Component
 	ChildrenIndexMap []string
 	Iterator         uint
@@ -79,43 +72,29 @@ func NewBaseComponent() Component {
 	}
 }
 
-// Render text/html template
-func (dc *BaseComponent) Render() string {
-	return `<{{.GetTag}} id="{{.GetId}}"{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }} {{if .IsSelfClosing }}/{{end}}>
-		{{ .GetValue }}
-		{{ range $key, $value := .GetChildrenList }}
-			{{ Generate $value }}
-		{{ end }}
-	{{if not .IsSelfClosing }} 
-		</{{.GetTag}}>
-	{{end}}`
-}
-
-func (dc *BaseComponent) FuncMap() template.FuncMap {
-	return template.FuncMap{
-		"Generate":      Generate,
-		"GenerateChild": GenerateChild,
+func (bc *BaseComponent) Render() string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "<%v id=\"%v\"", bc.GetTag(), bc.GetId())
+	for k, v := range bc.GetAttributes() {
+		fmt.Fprintf(&b, " %v=\"%v\" ", k, v)
 	}
+	if bc.IsSelfClosing() {
+		b.WriteString("/")
+	}
+	b.WriteString(">")
+	if !bc.IsSelfClosing() {
+		b.WriteString(bc.GetValue())
+		for _, v := range bc.ChildrenIndexMap {
+			b.WriteString(Generate(bc.Children[v]))
+		}
+
+		fmt.Fprintf(&b, "</%v>", bc.GetTag())
+	}
+	return b.String()
 }
 
 func Generate(c Component) string {
-	funcMap := c.FuncMap()
-	funcMap["Generate"] = Generate
-	funcMap["GenerateChild"] = GenerateChild
-
-	templateText := c.Render()
-	tmpl, err := template.New("Render").Funcs(funcMap).Parse(templateText)
-	if err != nil {
-		return err.Error()
-	}
-
-	buf := new(bytes.Buffer)
-	err = tmpl.Execute(buf, c)
-	if err != nil {
-		return err.Error()
-	}
-	htmlStr := buf.String()
-	return gohtml.Format(htmlStr)
+	return gohtml.Format(c.Render())
 }
 
 func GenerateChild(c Component, key string) string {
@@ -203,33 +182,6 @@ func (bc *BaseComponent) GetParent() Component {
 
 func (bc *BaseComponent) SetParent(c Component) {
 	bc.Parent = c
-}
-
-func (bc *BaseComponent) SetHeader(key string, value Component) {
-	if bc.Headers == nil {
-		bc.Headers = make(map[string]Component)
-	}
-	bc.Headers[key] = value
-}
-
-func (bc *BaseComponent) GetHeader(key string) Component {
-	if bc.Headers == nil {
-		return NewBaseComponent()
-	}
-	return bc.Headers[key]
-}
-
-func (bc *BaseComponent) GetHeaders() map[string]Component {
-	headers := make(map[string]Component)
-	for _, child := range bc.GetChildren() {
-		for key, value := range child.GetHeaders() {
-			headers[key] = value
-		}
-	}
-	for key, value := range bc.Headers {
-		headers[key] = value
-	}
-	return headers
 }
 
 func (bc *BaseComponent) SetAttribute(key, value string) {
