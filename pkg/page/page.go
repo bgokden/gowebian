@@ -77,7 +77,7 @@ func (dp *BasePage) Render() string {
   	</style>
   	</head>
   	<body {{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
-    {{ range $key, $value := .GetChildren }}
+    {{ range $key, $value := .GetChildrenList }}
       {{ Generate $value }}
     {{ end }}
   	</body>

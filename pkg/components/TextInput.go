@@ -9,12 +9,13 @@ type TextInput struct {
 	Value string
 }
 
-func NewTextInput() *TextInput {
-	return &TextInput{
-		Value: "...",
-	}
+func NewTextInput(text string) *TextInput {
+	ti := &TextInput{}
+	ti.SetTag("input")
+	ti.SetValue(text)
+	return ti
 }
 
 func (ti *TextInput) Render() string {
-	return `<input id="{{.GetId}}" value="{{.Value}}" placeholder="Name input">`
+	return `<{{.Tag}} id="{{.GetId}}" value="{{.GetValue}}" placeholder="{{.GetValue}}">`
 }

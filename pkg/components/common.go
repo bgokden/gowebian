@@ -6,53 +6,25 @@ import (
 
 type P struct {
 	component.BaseComponent
-	Value string
 }
 
 func NewP(text string) *P {
-	e := &P{
-		Value: text,
-	}
-	e.Tag = "p"
-	return e
-}
-
-func (p *P) Render() string {
-	return `<{{.Tag}} id="{{.GetId}}">{{.Value}}</{{.Tag}}>`
+	p := &P{}
+	p.SetTag("p")
+	p.SetValue(text)
+	return p
 }
 
 type Button struct {
 	component.BaseComponent
-	Value string
 }
 
 func NewButton(text string) component.Component {
-	e := &Button{
-		Value: text,
-	}
-	e.Tag = "button"
-	return e
-}
-
-func (b *Button) Render() string {
-	return `<{{.Tag}} id="{{.GetId}}" type="button">{{.Value}}</{{.Tag}}>`
-}
-
-type Text struct {
-	component.BaseComponent
-	Value string
-}
-
-func NewText(text string) *Text {
-	t := &Text{
-		Value: text,
-	}
-	t.SetTag("")
-	return t
-}
-
-func (t *Text) Render() string {
-	return `{{.Value}}`
+	b := &Button{}
+	b.SetTag("button")
+	b.SetAttribute("type", "button")
+	b.SetValue(text)
+	return b
 }
 
 type Title struct {
@@ -61,15 +33,11 @@ type Title struct {
 }
 
 func NewTitle(text string) *Title {
-	c := &Title{
+	t := &Title{
 		Value: text,
 	}
-	c.SetTag("title")
-	return c
-}
-
-func (c *Title) Render() string {
-	return `<{{.Tag}}>{{.Value}}</{{.Tag}}>`
+	t.SetTag("title")
+	return t
 }
 
 type Meta struct {
@@ -77,19 +45,22 @@ type Meta struct {
 }
 
 func NewMeta(attributeMap map[string]string) *Meta {
-	c := &Meta{}
-	c.SetTag("meta")
+	m := &Meta{}
+	m.SetTag("meta")
 	if attributeMap != nil {
 		for k, v := range attributeMap {
-			c.SetAttribute(k, v)
+			m.SetAttribute(k, v)
 		}
 	}
-	return c
+	m.SetSelfClosing(true)
+	return m
 }
 
-func (c *Meta) Render() string {
+/*
+func (m *Meta) Render() string {
 	return `<{{.Tag}}{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>`
 }
+*/
 
 type Script struct {
 	component.BaseComponent
@@ -104,19 +75,20 @@ func NewScript(attributeMap map[string]string, code string) *Script {
 			c.SetAttribute(k, v)
 		}
 	}
-	if code != "" {
-		c.AddChild(NewText(code))
-	}
+	c.SetValue(code)
 	return c
 }
 
+/*
 func (c *Script) Render() string {
 	return `<{{.GetTag}}{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
+	{{ .GetValue }}
 	{{ range $key, $value := .GetChildren }}
   	{{ Generate $value }}
 	{{ end }}
 </{{.GetTag}}>`
 }
+*/
 
 func NewScriptFromSource(src string) *Script {
 	return NewScript(map[string]string{

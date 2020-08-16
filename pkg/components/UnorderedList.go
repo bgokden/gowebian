@@ -27,13 +27,13 @@ type ListElement struct {
 
 func NewListElement() *ListElement {
 	e := &ListElement{}
-	e.Tag = "li"
+	e.Tag = "il"
 	return e
 }
 
 func NewTextElement(text string) component.Component {
 	e := &ListElement{}
 	e.Tag = "li"
-	e.SetChild("0", NewP(text))
+	e.SetValue(text)
 	return e
 }

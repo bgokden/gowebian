@@ -1,5 +1,7 @@
 github.com/gopherjs/vecty v0.0.0-20190701174234-2b6fc20f8913 h1:h5R2K5Wqn5av3i4xHkyVgI2qCSbpJHAqqAkKpMPh0eE=
 github.com/gopherjs/vecty v0.0.0-20190701174234-2b6fc20f8913/go.mod h1:Yd9AOfl6lN1BWnVnvaSBwKiTCAcnlIGGvdsODOOZ9RY=
+github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047 h1:YWaOkupKL+BRRJSWRq/uhSkWXc1K0QVIYVG36XUBGOc=
+github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047/go.mod h1:+ccdNT0xMY1dtc5XBxumbYfOUhmduiGudqaDgD2rVRE=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 h1:e6HwijUxhDe+hPNjZQQn9bA5PW3vNmnN64U2ZW759Lk=
 golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=

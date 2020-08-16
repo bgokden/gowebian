@@ -8,17 +8,13 @@ import (
 
 type TextLabel struct {
 	component.BaseComponent
-	Value string
 }
 
-func NewTextLabel() *TextLabel {
-	return &TextLabel{
-		Value: "...",
-	}
-}
-
-func (tl *TextLabel) Render() string {
-	return `<label id="{{.GetId}}" for="...">{{.Value}}</label>`
+func NewTextLabel(text string) *TextLabel {
+	tl := &TextLabel{}
+	tl.SetTag("label")
+	tl.SetValue(text)
+	return tl
 }
 
 func (tl *TextLabel) OnMessage(m *component.Message) component.Component {

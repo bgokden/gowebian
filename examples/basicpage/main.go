@@ -15,8 +15,8 @@ import (
 func main() {
 	pg := page.NewBasePage()
 	pg.SetTitle("Empty Page")
-	textlabel := components.NewTextLabel()
-	textInput := components.NewTextInput()
+	textInput := components.NewTextInput("...")
+	textlabel := components.NewTextLabel("enter input")
 	textInput.SetCallback("change", func(e interface{}) {
 		events.Emit(&component.Message{
 			From:  textInput,
@@ -27,6 +27,7 @@ func main() {
 	})
 	pg.SetChild("label", textlabel)
 	pg.SetChild("input", textInput)
+	textlabel.SetAttribute("for", textInput.GetId())
 	list := components.NewUnorderedList()
 	textElement := components.NewTextElement("element 0")
 	textElement.RegisterOnClick(func(e interface{}) {

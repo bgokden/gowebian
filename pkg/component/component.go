@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/yosssi/gohtml"
 	"golang.org/x/net/html"
 )
 
@@ -23,6 +24,7 @@ type Component interface {
 	GetHeader(key string) Component
 	GetHeaders() map[string]Component
 	GetChildren() map[string]Component
+	GetChildrenList() []Component
 	HasChildren() bool
 	SetChild(key string, child Component)
 	GetChild(key string) Component
@@ -41,6 +43,10 @@ type Component interface {
 	SetAttribute(key, value string)
 	GetAttribute(key string) string
 	GetAttributes() map[string]string
+	GetValue() string
+	SetValue(value string)
+	IsSelfClosing() bool
+	SetSelfClosing(bool)
 }
 
 type Message struct {
@@ -52,14 +58,17 @@ type Message struct {
 
 type BaseComponent struct {
 	JsBase
-	Key        string
-	Tag        string
-	Parent     Component
-	Headers    map[string]Component
-	Children   map[string]Component
-	Iterator   uint
-	Callbacks  map[string]interface{}
-	Attributes map[string]string
+	Key              string
+	Tag              string
+	Value            string
+	Parent           Component
+	Headers          map[string]Component
+	Children         map[string]Component
+	ChildrenIndexMap []string
+	Iterator         uint
+	Callbacks        map[string]interface{}
+	Attributes       map[string]string
+	SelfClosing      bool
 }
 
 func NewBaseComponent() Component {
@@ -72,11 +81,14 @@ func NewBaseComponent() Component {
 
 // Render text/html template
 func (dc *BaseComponent) Render() string {
-	return `<{{.GetTag}} id="{{.GetId}}"{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }}>
-	{{ range $key, $value := .GetChildren }}
-  	{{ Generate $value }}
-	{{ end }}
-</{{.GetTag}}>`
+	return `<{{.GetTag}} id="{{.GetId}}"{{ range $key, $value := .GetAttributes }} {{ printf "%s=\"%s\"" $key $value }} {{ end }} {{if .IsSelfClosing }}/{{end}}>
+		{{ .GetValue }}
+		{{ range $key, $value := .GetChildrenList }}
+			{{ Generate $value }}
+		{{ end }}
+	{{if not .IsSelfClosing }} 
+		</{{.GetTag}}>
+	{{end}}`
 }
 
 func (dc *BaseComponent) FuncMap() template.FuncMap {
@@ -102,7 +114,8 @@ func Generate(c Component) string {
 	if err != nil {
 		return err.Error()
 	}
-	return buf.String()
+	htmlStr := buf.String()
+	return gohtml.Format(htmlStr)
 }
 
 func GenerateChild(c Component, key string) string {
@@ -115,6 +128,14 @@ func GenerateChild(c Component, key string) string {
 
 func (bc *BaseComponent) GetChildren() map[string]Component {
 	return bc.Children
+}
+
+func (bc *BaseComponent) GetChildrenList() []Component {
+	list := make([]Component, 0, len(bc.Children))
+	for _, v := range bc.ChildrenIndexMap {
+		list = append(list, bc.Children[v])
+	}
+	return list
 }
 
 func (bc *BaseComponent) HasChildren() bool {
@@ -131,6 +152,11 @@ func (bc *BaseComponent) SetChild(key string, child Component) {
 	child.SetKey(key)
 	child.SetParent(bc)
 	bc.Children[key] = child
+	if bc.ChildrenIndexMap == nil {
+		bc.ChildrenIndexMap = make([]string, 0)
+	}
+	bc.ChildrenIndexMap = append(bc.ChildrenIndexMap, key)
+	bc.Iterator++
 }
 
 func (bc *BaseComponent) GetChild(key string) Component {
@@ -142,7 +168,6 @@ func (bc *BaseComponent) GetChild(key string) Component {
 
 func (bc *BaseComponent) AddChild(child Component) {
 	key := fmt.Sprintf("%d", bc.Iterator)
-	bc.Iterator++
 	bc.SetChild(key, child)
 }
 
@@ -267,6 +292,22 @@ func (bc *BaseComponent) GetCallback(key string) interface{} {
 		}
 	}
 	return bc.Callbacks[key]
+}
+
+func (bc *BaseComponent) GetValue() string {
+	return bc.Value
+}
+
+func (bc *BaseComponent) SetValue(value string) {
+	bc.Value = value
+}
+
+func (bc *BaseComponent) IsSelfClosing() bool {
+	return bc.SelfClosing
+}
+
+func (bc *BaseComponent) SetSelfClosing(value bool) {
+	bc.SelfClosing = value
 }
 
 func (bc *BaseComponent) GetCallbacks() map[string]interface{} {
