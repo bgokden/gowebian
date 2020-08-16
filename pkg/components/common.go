@@ -56,6 +56,22 @@ func NewMeta(attributeMap map[string]string) *Meta {
 	return m
 }
 
+type Link struct {
+	component.BaseComponent
+}
+
+func NewLink(attributeMap map[string]string) *Link {
+	m := &Link{}
+	m.SetTag("link")
+	if attributeMap != nil {
+		for k, v := range attributeMap {
+			m.SetAttribute(k, v)
+		}
+	}
+	m.SetSelfClosing(true)
+	return m
+}
+
 type Script struct {
 	component.BaseComponent
 	Code string

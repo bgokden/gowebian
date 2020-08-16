@@ -39,6 +39,8 @@ type Component interface {
 	GetAttributes() map[string]string
 	GetValue() string
 	SetValue(value string)
+	GetPostValue() string
+	SetPostValue(value string)
 	IsSelfClosing() bool
 	SetSelfClosing(bool)
 }
@@ -55,6 +57,7 @@ type BaseComponent struct {
 	Key              string
 	Tag              string
 	Value            string
+	PostValue        string
 	Parent           Component
 	Children         map[string]Component
 	ChildrenIndexMap []string
@@ -87,7 +90,7 @@ func (bc *BaseComponent) Render() string {
 		for _, v := range bc.ChildrenIndexMap {
 			b.WriteString(Generate(bc.Children[v]))
 		}
-
+		b.WriteString(bc.GetPostValue())
 		fmt.Fprintf(&b, "</%v>", bc.GetTag())
 	}
 	return b.String()
@@ -252,6 +255,14 @@ func (bc *BaseComponent) GetValue() string {
 
 func (bc *BaseComponent) SetValue(value string) {
 	bc.Value = value
+}
+
+func (bc *BaseComponent) GetPostValue() string {
+	return bc.PostValue
+}
+
+func (bc *BaseComponent) SetPostValue(value string) {
+	bc.PostValue = value
 }
 
 func (bc *BaseComponent) IsSelfClosing() bool {
